@@ -45,57 +45,5 @@ GitHubClone/
 │-- .gitignore         # Ignored Files
 ```
 
-## 🚀 Installation & Setup
-
-### 1️⃣ Clone the Repository
-```bash
-git clone https://github.com/your-username/github-clone.git
-cd github-clone
-```
-
-### 2️⃣ Backend Setup
-```bash
-cd backend
-npm install
-npm start
-```
-
-### 3️⃣ Frontend Setup
-```bash
-cd frontend
-npm install
-npm start
-```
-
-## 🎯 API Endpoints
-
-### 🔹 User Routes
-- `POST /user/register` - Register a new user
-- `POST /user/login` - Login user
-- `GET /user/:id` - Get user details
-
-### 🔹 Repository Routes
-- `POST /repo/create` - Create a repository
-- `GET /repo/:id` - Get repository details
-- `PUT /repo/update/:id` - Update repository
-- `DELETE /repo/delete/:id` - Delete repository
-
-### 🔹 Issue Routes
-- `POST /issue/create` - Create an issue
-- `GET /issue/:id` - Get issue details
-- `PUT /issue/update/:id` - Update issue
-- `DELETE /issue/delete/:id` - Delete issue
-
-## 📌 Future Enhancements
-- Pull Requests & Merge functionality
-- CI/CD Integration
-- Webhooks & Notifications
-- Markdown Support for Issues
-
-## 📜 License
-This project is licensed under the MIT License.
-
----
-
 🎉 **Happy Coding!** 🚀
 

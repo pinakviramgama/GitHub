@@ -25,27 +25,25 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-const mongoURL = process.env.MONGO_URL;
+const mongURL = process.env.MONGO_URL;
 
-// ✅ MongoDB connection
+// MongoDB connection
 mongoose
-  .connect(mongoURL)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB error:", err));
+  .connect(mongURL)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB error:", err));
 
-// ✅ Middlewares
+// Middlewares
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+// ✅ Use ONLY this CORS setup
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://your-frontend-domain.vercel.app",
-    ], // allow both dev and prod frontend
-    credentials: true,
+    origin: "http://localhost:5173", // frontend
+    credentials: true, // allow sending cookies
   })
 );
 
@@ -58,24 +56,24 @@ app.use(
 );
 app.use(flash());
 
-// ✅ Views and Static Assets (only needed if using EJS)
+// Views and public assets
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "..", "Fronted", "views")); // Be careful: folder name is "Fronted", not "Frontend"
+app.set("views", path.join(__dirname, "..", "Fronted", "views"));
 app.use(express.static(path.join(__dirname, "..", "Fronted", "public")));
 
-// ✅ Main Routes
+// Routes
 app.use("/", mainRouter);
 
-// ✅ CLI commands using yargs
+// CLI commands using yargs
 yargs(hideBin(process.argv))
-  .command("start", "Start the server", {}, startServer)
+  .command("start", "starts a new server", {}, startServer)
   .command("init", "Initialize a new repo", {}, initRepo)
   .command(
     "add <file>",
-    "Add a file to staging",
+    "add a file to repo",
     (yargs) => {
       yargs.positional("file", {
-        describe: "File to stage",
+        describe: "file to add to staging area",
         type: "string",
       });
     },
@@ -83,16 +81,16 @@ yargs(hideBin(process.argv))
   )
   .command(
     "commit <message>",
-    "Commit staged files",
+    "Commits the staged files",
     (yargs) => {
       yargs.positional("message", {
-        describe: "Commit message",
+        describe: "commit message",
         type: "string",
       });
     },
     (argv) => commitRepo(argv.message)
   )
-  .command("pull", "Pull from S3", {}, pullRepo)
+  .command("pull", "pulls changes from S3", {}, pullRepo)
   .command(
     "push",
     "Push to GitHub",
@@ -106,7 +104,7 @@ yargs(hideBin(process.argv))
         })
         .option("owner", {
           alias: "o",
-          describe: "GitHub owner",
+          describe: "GitHub username or organization",
           type: "string",
           demandOption: true,
         });
@@ -115,24 +113,24 @@ yargs(hideBin(process.argv))
   )
   .command(
     "revert <commitID>",
-    "Revert to a commit",
+    "Reverts changes to a commit",
     (yargs) => {
       yargs.positional("commitID", {
-        describe: "Commit ID to revert to",
+        describe: "Revert commit ID",
         type: "string",
       });
     },
     (argv) => revertRepo(argv.commitID)
   )
-  .demandCommand(1, "⚠️ At least one command is required")
+  .demandCommand(1, "Need at least one command")
   .help().argv;
 
-// ✅ Start server and socket
+// Start server with Socket.io
 function startServer() {
   const httpServer = http.createServer(app);
   const io = new Server(httpServer, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: "http://localhost:5173", // ✅ allow your frontend for socket
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -144,11 +142,12 @@ function startServer() {
     });
   });
 
-  mongoose.connection.once("open", () => {
-    console.log("✅ MongoDB connection open");
+  const db = mongoose.connection;
+  db.once("open", () => {
+    console.log("MongoDB connection open.");
   });
 
   httpServer.listen(port, () => {
-    console.log(`🚀 Server running on http://localhost:${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
   });
 }

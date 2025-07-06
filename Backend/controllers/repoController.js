@@ -1,5 +1,7 @@
 const { MongoClient, ObjectId } = require("mongodb");
 const dotenv = require("dotenv");
+const User = require("../models/userModel");
+const Repository = require("../models/repoModel");
 
 dotenv.config();
 
@@ -21,11 +23,12 @@ const createRepo = async (req, res) => {
   try {
     await connectClient();
     const db = client.db("githubclone");
-    const repoCollection = db.collection("repositories"); // Use correct collection name
+    const repoCollection = db.collection("repositories");
+    const userCollection = db.collection("users");
 
-    // Create new repo object
+    // Prepare new repository object
     const newRepository = {
-      owner,
+      owner, // this is expected to be the userId as string
       reponame,
       issues,
       content,
@@ -34,15 +37,50 @@ const createRepo = async (req, res) => {
       createdAt: new Date(),
     };
 
-    // Insert into MongoDB
+    // Insert the new repo
     const result = await repoCollection.insertOne(newRepository);
+    const newRepoId = result.insertedId;
 
-    res
-      .status(201)
-      .json({ message: "Repo Created Successfully", repo: result });
+    // Update the user’s repositories array
+    await userCollection.updateOne(
+      { _id: new ObjectId(owner) }, // Match user by ObjectId
+      { $push: { repositories: newRepoId } }
+    );
+
+    res.status(201).json({
+      message: "Repo Created Successfully",
+      repo: { ...newRepository, _id: newRepoId },
+    });
   } catch (err) {
-    console.error(" Error in creating repository:", err.message);
+    console.error("Error in creating repository:", err.message);
     res.status(500).json({ error: err.message });
+  }
+};
+
+const getRepoById = async (req, res) => {
+  try {
+    await connectClient();
+    const db = client.db("githubclone");
+    const repoId = req.params.id;
+
+    if (!ObjectId.isValid(repoId)) {
+      return res.status(400).json({ message: "Invalid repository ID" });
+    }
+
+    const repo = await db
+      .collection("repositories")
+      .findOne({ _id: new ObjectId(repoId) });
+
+    if (!repo) {
+      return res.status(404).json({ message: "Repository not found" });
+    }
+
+    res.status(200).json({ repository: repo });
+  } catch (err) {
+    console.error("Error fetching repository:", err.message);
+    res
+      .status(500)
+      .json({ message: "Error fetching repository: " + err.message });
   }
 };
 
@@ -50,13 +88,15 @@ const getAllRepo = async (req, res) => {
   try {
     await connectClient();
     const db = client.db("githubclone");
-    const repoCollection = db.collection("repositories");
 
-    const repos = await repoCollection.find({}).toArray();
+    const repos = await db.collection("repositories").find({}).toArray();
 
     res.json(repos);
   } catch (err) {
-    console.log("something went wrong", err);
+    console.error("Error fetching repositories:", err.message);
+    res
+      .status(500)
+      .json({ error: "Something went wrong while fetching repos" });
   }
 };
 
@@ -70,6 +110,7 @@ const deleteRepo = async (req, res) => {
 
     // Check if repo exists
     const repo = await repoCollection.findOne({ _id: new ObjectId(repoId) });
+
     if (!repo) {
       return res.status(404).json({ message: "Repo not found" });
     }
@@ -80,6 +121,70 @@ const deleteRepo = async (req, res) => {
     res.status(200).json({ message: "Repo deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: "Error deleting repo: " + err.message });
+  }
+};
+
+const starRepo = async (req, res) => {
+  const repoId = req.params.id;
+
+  try {
+    await connectClient();
+    const db = client.db("githubclone");
+    const repoCollection = db.collection("repositories");
+
+    // Make sure repo is found
+    const repo = await repoCollection.findOne({ _id: new ObjectId(repoId) });
+
+    if (!repo) {
+      return res.status(404).json({ message: "Repository not found" });
+    }
+
+    const newStarredStatus = !repo.starred;
+
+    await repoCollection.updateOne(
+      { _id: new ObjectId(repoId) },
+      { $set: { starred: newStarredStatus } }
+    );
+
+    res.json({
+      success: true,
+      starred: newStarredStatus,
+    });
+  } catch (err) {
+    console.error("Error toggling star:", err);
+    res.status(500).json({ message: "Error toggling star: " + err.message });
+  }
+};
+
+const pinRepo = async (req, res) => {
+  const repoId = req.params.id;
+
+  try {
+    await connectClient();
+    const db = client.db("githubclone");
+    const repoCollection = db.collection("repositories");
+
+    // Make sure repo is found
+    const repo = await repoCollection.findOne({ _id: new ObjectId(repoId) });
+
+    if (!repo) {
+      return res.status(404).json({ message: "Repository not found" });
+    }
+
+    const newPinnedStatus = !repo.pinned;
+
+    await repoCollection.updateOne(
+      { _id: new ObjectId(repoId) },
+      { $set: { pinned: newPinnedStatus } }
+    );
+
+    res.json({
+      success: true,
+      pinned: newPinnedStatus,
+    });
+  } catch (err) {
+    console.error("Error toggling pin:", err);
+    res.status(500).json({ message: "Error toggling pin: " + err.message });
   }
 };
 
@@ -190,6 +295,26 @@ const toggleVisibilityById = async (req, res) => {
   }
 };
 
+const searchBar = async (req, res) => {
+  try {
+    const { query, userId } = req.query;
+
+    if (!query || !userId) {
+      return res.status(400).json({ message: "Query and userId are required" });
+    }
+
+    const results = await Repository.find({
+      owner: userId,
+      reponame: { $regex: query, $options: "i" }, // Case-insensitive match
+    });
+
+    res.json({ results });
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ message: "Server error while searching repos" });
+  }
+};
+
 const deleteRepoById = async (req, res) => {
   try {
     await connectClient();
@@ -221,4 +346,8 @@ module.exports = {
   updateRepoById,
   toggleVisibilityById,
   deleteRepoById,
+  getRepoById,
+  starRepo,
+  pinRepo,
+  searchBar,
 };

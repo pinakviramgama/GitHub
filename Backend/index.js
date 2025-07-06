@@ -17,21 +17,37 @@ const pullRepo = require("./controllers/pull");
 const revertRepo = require("./controllers/revert");
 const pushRepo = require("./controllers/push");
 
-dotenv.config();
-const app = express(); // Only ONE express instance
-const port = process.env.PORT || 3000;
-const mongURL = process.env.mongURL;
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
-// Set view engine and views directory
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "..", "Fronted", "views"));
-app.use(express.static(path.join(__dirname, "..", "Fronted", "public")));
 const cookieParser = require("cookie-parser");
-app.use(cookieParser());
 const session = require("express-session");
 const flash = require("connect-flash");
+
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 3000;
+const mongoURL = process.env.MONGO_URL;
+
+// ✅ MongoDB connection
+mongoose
+  .connect(mongoURL)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch((err) => console.error("❌ MongoDB error:", err));
+
+// ✅ Middlewares
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(bodyParser.json());
+app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://your-frontend-domain.vercel.app",
+    ], // allow both dev and prod frontend
+    credentials: true,
+  })
+);
 
 app.use(
   session({
@@ -40,30 +56,26 @@ app.use(
     saveUninitialized: true,
   })
 );
-
 app.use(flash());
 
-app.use(bodyParser.json());
-app.use(cors({ origin: "*" }));
+// ✅ Views and Static Assets (only needed if using EJS)
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "..", "Fronted", "views")); // Be careful: folder name is "Fronted", not "Frontend"
+app.use(express.static(path.join(__dirname, "..", "Fronted", "public")));
 
+// ✅ Main Routes
 app.use("/", mainRouter);
 
-// Connect to MongoDB
-mongoose
-  .connect(mongURL)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log(err));
-
-// Start server via yargs
+// ✅ CLI commands using yargs
 yargs(hideBin(process.argv))
-  .command("start", "starts a new server", {}, startServer)
+  .command("start", "Start the server", {}, startServer)
   .command("init", "Initialize a new repo", {}, initRepo)
   .command(
     "add <file>",
-    "add a file to repo",
+    "Add a file to staging",
     (yargs) => {
       yargs.positional("file", {
-        describe: "file to add to staging area",
+        describe: "File to stage",
         type: "string",
       });
     },
@@ -71,16 +83,16 @@ yargs(hideBin(process.argv))
   )
   .command(
     "commit <message>",
-    "Commits the staged files",
+    "Commit staged files",
     (yargs) => {
       yargs.positional("message", {
-        describe: "commit message",
+        describe: "Commit message",
         type: "string",
       });
     },
     (argv) => commitRepo(argv.message)
   )
-  .command("pull", "pulls changes from S3", {}, pullRepo)
+  .command("pull", "Pull from S3", {}, pullRepo)
   .command(
     "push",
     "Push to GitHub",
@@ -94,7 +106,7 @@ yargs(hideBin(process.argv))
         })
         .option("owner", {
           alias: "o",
-          describe: "GitHub username or organization",
+          describe: "GitHub owner",
           type: "string",
           demandOption: true,
         });
@@ -103,25 +115,26 @@ yargs(hideBin(process.argv))
   )
   .command(
     "revert <commitID>",
-    "Reverts changes to a commit",
+    "Revert to a commit",
     (yargs) => {
       yargs.positional("commitID", {
-        describe: "Revert commit ID",
+        describe: "Commit ID to revert to",
         type: "string",
       });
     },
     (argv) => revertRepo(argv.commitID)
   )
-  .demandCommand(1, "Need at least one command")
+  .demandCommand(1, "⚠️ At least one command is required")
   .help().argv;
 
-// Start server function
+// ✅ Start server and socket
 function startServer() {
   const httpServer = http.createServer(app);
   const io = new Server(httpServer, {
     cors: {
-      origin: "*",
+      origin: "http://localhost:5173",
       methods: ["GET", "POST"],
+      credentials: true,
     },
   });
 
@@ -131,12 +144,11 @@ function startServer() {
     });
   });
 
-  const db = mongoose.connection;
-  db.once("open", () => {
-    console.log("MongoDB connection open.");
+  mongoose.connection.once("open", () => {
+    console.log("✅ MongoDB connection open");
   });
 
   httpServer.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`🚀 Server running on http://localhost:${port}`);
   });
 }

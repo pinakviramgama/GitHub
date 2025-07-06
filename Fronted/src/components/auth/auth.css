@@ -1,0 +1,103 @@
+/* Signup/Login wrapper */
+.login-wrapper {
+  margin-top: 20%;
+  margin-left: 20%;
+  background-color: #0d1117;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+}
+
+/* Logo container */
+.login-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.logo-login {
+  width: 48px;
+  height: 48px;
+}
+
+/* Box that holds form */
+.login-box-wrapper {
+  width: 100%;
+  max-width: 340px;
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  padding: 2rem;
+  border-radius: 6px;
+  box-shadow: 0 0 0 transparent;
+}
+
+/* Form heading */
+.login-heading h1 {
+  color: #c9d1d9;
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Form container */
+.login-box {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Labels */
+.label {
+  font-size: 14px;
+  color: #c9d1d9;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+/* Inputs */
+.input {
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #c9d1d9;
+  margin-bottom: 16px;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #58a6ff;
+  box-shadow: 0 0 0 2px rgba(56, 139, 253, 0.2);
+}
+
+/* Button */
+.login-btn {
+  background-color: #238636 !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  font-size: 14px !important;
+}
+
+.login-btn:hover {
+  background-color: #2ea043 !important;
+}
+
+/* Already have account text */
+.pass-box {
+  font-size: 13px;
+  color: #8b949e;
+  text-align: center;
+}
+
+.pass-box a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.pass-box a:hover {
+  text-decoration: underline;
+}

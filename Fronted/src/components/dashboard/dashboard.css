@@ -1,0 +1,120 @@
+/* dashboard.css */
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #0d1117;
+  color: #c9d1d9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+.dashboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.dashboard-layout {
+  display: flex;
+  flex: 1;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+/* LEFT SIDEBAR */
+.sidebar {
+  width: 20%;
+  background-color: #161b22;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-y: auto;
+  min-height: 400px;
+}
+
+.sidebar .repo-card {
+  background-color: #21262d;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  border: 1px solid #30363d;
+}
+
+.repo-card a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.repo-card .repo-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.star-button {
+  background-color: transparent;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.star-button.active {
+  background-color: #238636;
+  color: white;
+}
+
+.star-button:hover {
+  background-color: #2ea043;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  flex: 1;
+  background-color: #161b22;
+  padding: 1rem;
+  border-radius: 8px;
+  min-height: 400px;
+}
+
+.main-content .repo-card {
+  background-color: #21262d;
+  padding: 0.8rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  border: 1px solid #30363d;
+}
+
+/* RIGHT SIDEBAR */
+.right-sidebar {
+  width: 20%;
+  background-color: #161b22;
+  padding: 1rem;
+  border-radius: 8px;
+  min-height: 400px;
+}
+
+/* Suggestions Dropdown */
+ul[style*="position: absolute"] {
+  background-color: #21262d;
+  color: #c9d1d9;
+}
+
+ul[style*="position: absolute"] li:hover {
+  background-color: #30363d;
+}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar,
+.right-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+.right-sidebar::-webkit-scrollbar-thumb {
+  background-color: #444c56;
+  border-radius: 3px;
+}

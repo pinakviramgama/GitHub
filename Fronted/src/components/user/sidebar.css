@@ -1,0 +1,37 @@
+    /* src/components/Sidebar.css */
+    .sidebar {
+        width: 250px;
+        background-color: #333;
+        color: white;
+        position: fixed;
+        top: 0;
+        left: -250px; /* Initially hidden */
+        height: 100%;
+        transition: left 0.3s ease-in-out;
+        padding-top: 60px; /* Adjust for toggle button */
+      }
+
+      .sidebar.open {
+        left: 0; /* Visible when open */
+      }
+
+      .sidebar ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .sidebar li {
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+
+      .sidebar li:hover {
+        background-color: #555;
+      }
+
+      .sidebar-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 100; /* Ensure it's above other content */
+      }

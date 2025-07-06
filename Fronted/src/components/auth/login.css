@@ -1,0 +1,104 @@
+/* Base wrapper */
+.github-login-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0d1117;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  /* Login box */
+  .github-login-box {
+    width: 100%;
+    max-width: 340px;
+    padding: 32px;
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    box-shadow: 0 0 0 transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* GitHub logo */
+  .github-logo {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 24px;
+  }
+
+  /* Title */
+  .github-login-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #c9d1d9;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  /* Form styles */
+  .github-login-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Labels */
+  .github-label {
+    font-size: 14px;
+    color: #c9d1d9;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  /* Inputs */
+  .github-input {
+    background-color: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #c9d1d9;
+    margin-bottom: 16px;
+    font-size: 14px;
+    outline: none;
+  }
+
+  .github-input:focus {
+    border-color: #58a6ff;
+    box-shadow: 0 0 0 2px rgba(56, 139, 253, 0.2);
+  }
+
+  /* Button */
+  .github-button {
+    background-color: #238636;
+    border: 1px solid rgba(240, 246, 252, 0.1);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .github-button:hover {
+    background-color: #2ea043;
+  }
+
+  /* Footer */
+  .github-footer-text {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #8b949e;
+  }
+
+  .github-footer-text a {
+    color: #58a6ff;
+    text-decoration: none;
+  }
+
+  .github-footer-text a:hover {
+    text-decoration: underline;
+  }

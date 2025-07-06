@@ -1,0 +1,33 @@
+.create-repo-wrapper {
+    max-width: 600px;
+    margin: 2rem auto;
+    background: #1f1f1f;
+    padding: 2rem;
+    border-radius: 10px;
+    color: white;
+  }
+
+  .create-repo-form input,
+  .create-repo-form textarea,
+  .create-repo-form select {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    background: #2c2c2c;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 5px;
+  }
+
+  .create-repo-form button {
+    padding: 0.75rem 2rem;
+    background: #007bff;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .create-repo-form button:hover {
+    background: #0056b3;
+  }

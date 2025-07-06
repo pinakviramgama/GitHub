@@ -43,10 +43,11 @@ const signup = async (req, res) => {
     const existingUser = await usersCollection.findOne({
       $or: [{ username }, { email }],
     });
+
     if (existingUser) {
-      return res
-        .status(409)
-        .json({ message: "User already exists with this username or email." });
+      return res.status(409).json({
+        message: "User already exists with this username or email.",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -58,11 +59,13 @@ const signup = async (req, res) => {
       followedUsers: [],
       starRepos: [],
     };
+
     const result = await usersCollection.insertOne(newUser);
 
     const secretKey = process.env.JWT_SECRET_KEY;
-    if (!secretKey)
+    if (!secretKey) {
       return res.status(500).json({ message: "JWT secret key not defined." });
+    }
 
     const token = jwt.sign({ id: result.insertedId.toString() }, secretKey, {
       expiresIn: "1h",
@@ -70,7 +73,7 @@ const signup = async (req, res) => {
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // Change to true in production with HTTPS
+      secure: false,
       sameSite: "Lax",
       maxAge: 3600000,
     });
@@ -102,7 +105,6 @@ const login = async (req, res) => {
       expiresIn: "1h",
     });
 
-    // Set token in cookie (optional for frontend cookie-based auth)
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
@@ -110,7 +112,6 @@ const login = async (req, res) => {
       maxAge: 3600000,
     });
 
-    // ✅ Return required user data to frontend
     res.status(200).json({
       message: "Login successful",
       user: {
@@ -135,7 +136,9 @@ const getUserProfile = async (req, res) => {
       .collection("users")
       .findOne({ _id: new ObjectId(currentID) });
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     res.status(200).json({ message: "User available", user });
   } catch (err) {
@@ -155,7 +158,7 @@ const updateUserProfile = async (req, res) => {
     await connectClient();
     const db = client.db("githubclone");
 
-    let updateFields = {};
+    const updateFields = {};
     if (email) updateFields.email = email;
     if (password) updateFields.password = await bcrypt.hash(password, 10);
 

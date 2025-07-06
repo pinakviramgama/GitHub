@@ -14,7 +14,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("https://github-jdrf.onrender.com/login", {
+      const res = await fetch("https://github-3-667e.onrender.com/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
